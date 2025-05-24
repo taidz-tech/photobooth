@@ -1,5 +1,8 @@
+<!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8" />
+    <title>PhotoBooth</title>
     <style>
       body {
         display: flex;
@@ -123,6 +126,8 @@
         height: 100%;
         border-radius: 10px;
         background-color: #000;
+        /* thêm dòng này để lật ngang preview camera */
+        transform: scaleX(-1);
       }
 
       #countdown {
@@ -154,12 +159,12 @@
         background-color: #fff;
         border: 2px solid #ccc;
         border-radius: 10px;
+        transform: scaleX(-1);
       }
 
       .photo-slot img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
         border-radius: 10px;
       }
 
@@ -196,7 +201,6 @@
       .upload-slot img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
         border-radius: 10px;
       }
 
@@ -240,6 +244,7 @@
         border: 5px solid #ff99cc; /* Pink border */
         margin-bottom: 10px;
         display: block;
+        transform: scaleX(-1);
       }
 
       .photostrip .date {
@@ -382,7 +387,7 @@
     <div class="container">
       <!-- Capture Section -->
       <div class="capture-section active" id="capture-section">
-        <button id="capture-btn" class="button">Take a Photo</button>
+        <button id="capture-btn" class="button">Nhấn vào đây để chụp</button>
         <div class="video-container">
           <video id="video" autoplay></video>
           <div id="countdown"></div>
@@ -418,15 +423,15 @@
         <div class="photostrip-container">
           <div class="photostrip" id="photostrip">
             <div>
-              <img id="photo-1" src="" alt="Photo 1" />
+              <img id="photo-1" src="" alt=" " />
             </div>
             <div>
-              <img id="photo-2" src="" alt="Photo 2" />
+              <img id="photo-2" src="" alt=" " />
             </div>
             <div>
-              <img id="photo-3" src="" alt="Photo 3" />
+              <img id="photo-3" src="" alt=" " />
             </div>
-            <div class="date" id="date-stamp">March 16, 2025</div>
+            <div class="date" id="date-stamp">May 24, 2025</div>
           </div>
         </div>
         <div class="controls">
@@ -474,13 +479,13 @@
           <img id="scrap-photo-1" src="" alt="Photo 1" />
           <img id="scrap-photo-2" src="" alt="Photo 2" />
           <img id="scrap-photo-3" src="" alt="Photo 3" />
-          <div class="date">March 16, 2025</div>
+          <div class="date">May 24, 2025</div>
         </div>
         <div class="photostrip" style="right: 20px; top: 20px;">
           <img id="scrap-photo-4" src="" alt="Photo 4" />
           <img id="scrap-photo-5" src="" alt="Photo 5" />
           <img id="scrap-photo-6" src="" alt="Photo 6" />
-          <div class="date">March 16, 2025</div>
+          <div class="date">May 24, 2025</div>
         </div>
         <div class="thumbnail" style="left: 150px; top: 80px;"><img id="thumb-1" src="" alt="Thumbnail 1" /></div>
         <div class="thumbnail" style="left: 150px; top: 180px;"><img id="thumb-2" src="" alt="Thumbnail 2" /></div>
@@ -760,7 +765,7 @@
           context.font = "14px Arial";
           context.textAlign = "center";
           context.fillStyle = "#000";
-          context.fillText("March 16, 2025", 110, 650);
+          context.fillText("May 24, 2025", 110, 650);
         }
 
         var a = document.createElement("a");
