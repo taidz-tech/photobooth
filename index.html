@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <title>Super PhotoBooth Pro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
       body {
         display: flex;
         justify-content: center;
         align-items: center;
-        /* Nền web mix màu pastel cực chill, dịu mắt */
         background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         margin: 0;
@@ -31,7 +31,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        background: rgba(255, 255, 255, 0.95); /* Khung trắng mờ xịn xò */
+        background: rgba(255, 255, 255, 0.95);
         padding: 30px;
         border-radius: 20px;
         box-shadow: 0 15px 35px rgba(0,0,0,0.15);
@@ -147,7 +147,6 @@
         overflow: hidden; 
       }
 
-      /* BỘ SƯU TẬP BACKGROUND HOA HÒE CHO ẢNH */
       .bg-white { background-color: #fff; }
       .bg-haru { background-color: #aebce5; background-image: linear-gradient(#ffffff 2px, transparent 2px), linear-gradient(90deg, #ffffff 2px, transparent 2px); background-size: 20px 20px; }
       .bg-pink-dots { background-color: #ffcccc; background-image: radial-gradient(#fff 15%, transparent 16%), radial-gradient(#fff 15%, transparent 16%); background-size: 30px 30px; background-position: 0 0, 15px 15px; }
@@ -173,10 +172,9 @@
         padding: 5px; border-radius: 5px;
       }
 
-      /* STICKER CÓ THỂ KÉO THẢ */
       .photostrip-container .sticker {
         position: absolute; font-size: 30px; user-select: none;
-        cursor: grab; /* Biểu tượng bàn tay báo hiệu có thể kéo */
+        cursor: grab;
         filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
         transition: transform 0.1s;
       }
@@ -206,7 +204,7 @@
     <div id="flash"></div> 
     
     <div class="container">
-      <h1 style="color: #2f3542; margin-bottom: 5px;">📸 </h1>
+      <h1 style="color: #2f3542; margin-bottom: 5px;">📸</h1>
       <p style="color: #747d8c; margin-top: 0; margin-bottom: 20px;">Chill thử cho vui nè !</p>
 
       <div class="capture-section active" id="capture-section">
@@ -257,7 +255,7 @@
           </div>
 
           <div class="control-section stickers">
-            <label>🎨 Stickers (Click để dán, KÉO để di chuyển, CLICK ĐÚP để xóa nha mng ơi.)</label>
+            <label>🎨 Stickers (Click để dán, KÉO để di chuyển, CLICK ĐÚP để xóa)</label>
             <div class="btn-wrap">
                 <button data-sticker="❤️" class="text-btn">❤️</button>
                 <button data-sticker="✨" class="text-btn">✨</button>
@@ -375,7 +373,6 @@
         capturedImages.forEach((dataURL, index) => { photos[index].src = dataURL; });
       }
 
-      // Logic Đổi Background
       document.querySelectorAll(".circle-btn").forEach(button => {
         button.addEventListener("click", () => {
           photostrip.className = "photostrip"; 
@@ -384,7 +381,6 @@
         });
       });
 
-      // Logic Thêm Sticker & Kéo thả
       document.querySelectorAll(".stickers button").forEach(button => {
         button.addEventListener("click", () => {
           const stickerText = button.getAttribute("data-sticker");
@@ -393,30 +389,23 @@
           stickerEl.textContent = stickerText;
           stickerEl.className = (stickerText.length > 2) ? "sticker text-sticker" : "sticker";
           
-          // Khởi tạo vị trí ngẫu nhiên giữa màn hình ảnh
           stickerEl.style.top = (Math.random() * 500 + 50) + "px";
           stickerEl.style.left = (Math.random() * 100 + 50) + "px";
           
-          // Click đúp để xóa
           stickerEl.addEventListener('dblclick', () => { stickerEl.remove(); });
-
           photostrip.appendChild(stickerEl);
-          
-          // GỌI HÀM KÉO THẢ CHO STICKER VỪA TẠO
           dragElement(stickerEl);
         });
       });
 
-      // CƠ CHẾ KÉO THẢ THẦN THÁNH
       function dragElement(elmnt) {
         let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
         
         elmnt.onmousedown = dragMouseDown;
-        elmnt.ontouchstart = dragMouseDown; // Hỗ trợ màn hình cảm ứng điện thoại
+        elmnt.ontouchstart = dragMouseDown; 
 
         function dragMouseDown(e) {
           e = e || window.event;
-          // Ngăn cuộn màn hình khi lướt trên sticker
           if(e.type === 'touchstart') e.preventDefault(); 
           
           pos3 = e.clientX || e.touches[0].clientX;
@@ -462,8 +451,23 @@
         captureBtn.disabled = false;
       });
 
+      // TÍNH NĂNG TẢI ẢNH ĐÃ ĐƯỢC NÂNG CẤP XỊN SÒ TRỞ LẠI
       document.getElementById("download-btn").addEventListener("click", () => {
-         alert("Nếu lỡ có cần lưu ảnh thì mình cũng có thể chụp màn hình sau khi tải ảnh cho sắc nét nha mọi người !!!");
+        // Hiện thông báo theo đúng kịch bản sếp giao
+        alert("Nếu lỡ có cần lưu ảnh thì mình cũng có thể chụp màn hình sau khi tải ảnh cho sắc nét nha mọi người !!!");
+        
+        // Gọi html2canvas để render toàn bộ div 'photostrip' thành 1 tấm ảnh thật
+        html2canvas(document.getElementById("photostrip"), {
+            scale: 2, // Tăng chất lượng ảnh lên gấp đôi cho nét
+            useCORS: true, 
+            backgroundColor: null // Giữ nền trong suốt/gradient nếu có
+        }).then(canvas => {
+            // Đổi canvas thành dạng URL ảnh và tải về máy
+            const link = document.createElement("a");
+            link.download = "ANHCHUP.png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        });
       });
 
     </script>
