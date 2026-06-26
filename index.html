@@ -2,392 +2,219 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>PhotoBooth</title>
+    <title>Super PhotoBooth Pro</title>
     <style>
       body {
         display: flex;
         justify-content: center;
         align-items: center;
-        background-color: #f5f5d5; /* Beige background */
-        font-family: Arial, sans-serif;
+        /* Nền web mix màu pastel cực chill, dịu mắt */
+        background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         margin: 0;
         min-height: 100vh;
       }
+
+      #flash {
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        background-color: white;
+        z-index: 9999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.1s ease-out;
+      }
+      .flash-active { opacity: 1 !important; }
 
       .container {
         text-align: center;
         display: flex;
         flex-direction: column;
         align-items: center;
+        background: rgba(255, 255, 255, 0.95); /* Khung trắng mờ xịn xò */
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        backdrop-filter: blur(10px);
       }
 
-      .capture-section, .upload-section, .editor, .scrapbook {
+      .capture-section, .upload-section, .editor {
         display: none;
       }
 
-      .capture-section.active, .upload-section.active, .editor.active, .scrapbook.active {
+      .capture-section.active, .upload-section.active, .editor.active {
         display: flex;
         flex-direction: column;
         align-items: center;
+        animation: fadeIn 0.5s;
       }
 
+      @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
       .button {
-        background-color: #f4a261; /* Mustard yellow */
+        background-color: #ff7e67;
         color: #fff;
         border: none;
         padding: 12px 24px;
         font-size: 16px;
-        font-weight: 500;
+        font-weight: bold;
         cursor: pointer;
-        margin: 8px 0;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        transition: background-color 0.3s, transform 0.1s;
+        margin: 8px 5px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s;
       }
 
-      .button:disabled {
-        background-color: #ccc;
-        cursor: not-allowed;
-        box-shadow: none;
-      }
+      .button:disabled { background-color: #ccc; cursor: not-allowed; box-shadow: none; }
+      .button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
+      .button:active:not(:disabled) { transform: translateY(0); }
 
-      .button:hover:not(:disabled) {
-        background-color: #e08e3e;
-        transform: translateY(-1px);
-      }
-
-      .button:active:not(:disabled) {
-        transform: translateY(0);
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-      }
-
-      .button::before {
-        content: "📸 ";
-        margin-right: 8px;
-      }
-
-      #submit-btn {
-        background-color: #4a90e2; /* Blue */
-      }
-
-      #submit-btn::before {
-        content: "📤 ";
-      }
-
-      #submit-btn:hover:not(:disabled) {
-        background-color: #357abd;
-      }
-
-      #preview-btn {
-        background-color: #50e3c2; /* Teal */
-      }
-
-      #preview-btn::before {
-        content: "🔍 ";
-      }
-
-      #preview-btn:hover {
-        background-color: #38c0a3;
-      }
-
-      #download-btn {
-        background-color: #9b59b6; /* Purple */
-      }
-
-      #download-btn::before {
-        content: "⬇️ ";
-      }
-
-      #download-btn:hover {
-        background-color: #8e44ad;
-      }
-
-      #retake-btn {
-        background-color: #e74c3c; /* Red */
-      }
-
-      #retake-btn::before {
-        content: "🔄 ";
-      }
-
-      #retake-btn:hover {
-        background-color: #c0392b;
-      }
+      #capture-btn { background-color: #ff6b81; font-size: 20px; padding: 15px 30px; }
+      #capture-btn::before { content: "📸 "; }
+      #beauty-btn { background-color: #7bed9f; color: #2f3542; }
+      #beauty-btn.active { background-color: #2ed573; color: white; box-shadow: 0 0 10px #2ed573; }
+      #download-btn { background-color: #9b59b6; width: 100%; margin-top: 15px;}
+      #retake-btn { background-color: #ff4757; width: 100%;}
 
       .video-container {
         position: relative;
         width: 640px;
         height: 480px;
+        margin: 15px 0;
       }
 
       video {
-        border: 2px solid #333;
-        width: 100%;
-        height: 100%;
-        border-radius: 10px;
+        width: 100%; height: 100%;
+        border-radius: 15px;
         background-color: #000;
-        /* thêm dòng này để lật ngang preview camera */
         transform: scaleX(-1);
+        object-fit: cover;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        transition: filter 0.3s;
+      }
+
+      .beauty-on {
+        filter: brightness(1.15) contrast(0.95) saturate(1.2) blur(0.5px);
       }
 
       #countdown {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        top: 0; left: 0; width: 100%; height: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 120px;
+        font-size: 150px;
+        font-weight: bold;
         color: #fff;
-        background-color: rgba(0, 0, 0, 0.5);
-        border-radius: 10px;
+        background-color: rgba(0, 0, 0, 0.4);
+        border-radius: 15px;
         display: none;
+        text-shadow: 0 0 20px rgba(0,0,0,0.5);
       }
 
       #photos {
         display: flex;
         justify-content: center;
-        gap: 10px;
+        gap: 15px;
         margin-top: 10px;
       }
 
       .photo-slot {
-        width: 160px;
-        height: 160px;
-        background-color: #fff;
-        border: 2px solid #ccc;
+        width: 140px; height: 100px;
+        background-color: #eee;
+        border: 3px dashed #ccc;
         border-radius: 10px;
         transform: scaleX(-1);
+        display: flex; justify-content: center; align-items: center;
+        overflow: hidden;
       }
 
-      .photo-slot img {
-        width: 100%;
-        height: 100%;
-        border-radius: 10px;
-      }
-
-      #error-message {
-        color: red;
-        margin-top: 10px;
-        display: none;
-      }
-
-      .upload-section h2 {
-        margin-bottom: 20px;
-        color: #333;
-      }
-
-      .upload-slots {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-      }
-
-      .upload-slot {
-        width: 200px;
-        height: 200px;
-        background-color: #fff;
-        border: 2px dashed #ccc;
-        border-radius: 10px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        position: relative;
-      }
-
-      .upload-slot img {
-        width: 100%;
-        height: 100%;
-        border-radius: 10px;
-      }
-
-      .upload-slot input {
-        display: none;
-      }
-
-      .upload-slot::before {
-        content: "🖼️";
-        font-size: 40px;
-        color: #ccc;
-        position: absolute;
-      }
-
-      .upload-section p {
-        margin-top: 10px;
-        color: #666;
-        font-size: 14px;
-      }
+      .photo-slot img { width: 100%; height: 100%; object-fit: cover; }
 
       .editor {
-        display: flex;
-        gap: 20px;
-        margin-bottom: 20px;
+        flex-direction: row !important;
+        gap: 40px;
       }
 
-      .photostrip-container {
-        position: relative;
-      }
+      .photostrip-container { position: relative; }
 
       .photostrip {
         background-color: #fff;
-        padding: 10px;
-        border: 2px solid #fff;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        padding: 20px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        border-radius: 5px;
+        position: relative;
+        overflow: hidden; 
       }
 
+      /* BỘ SƯU TẬP BACKGROUND HOA HÒE CHO ẢNH */
+      .bg-white { background-color: #fff; }
+      .bg-haru { background-color: #aebce5; background-image: linear-gradient(#ffffff 2px, transparent 2px), linear-gradient(90deg, #ffffff 2px, transparent 2px); background-size: 20px 20px; }
+      .bg-pink-dots { background-color: #ffcccc; background-image: radial-gradient(#fff 15%, transparent 16%), radial-gradient(#fff 15%, transparent 16%); background-size: 30px 30px; background-position: 0 0, 15px 15px; }
+      .bg-grid-cute { background-color: #fdfbfb; background-image: linear-gradient(#e2e8f0 1.5px, transparent 1.5px), linear-gradient(90deg, #e2e8f0 1.5px, transparent 1.5px); background-size: 25px 25px; }
+      .bg-mint-stripes { background: repeating-linear-gradient(45deg, #a8edea, #a8edea 10px, #e2f8f7 10px, #e2f8f7 20px); }
+      .bg-pastel-gradient { background: linear-gradient(120deg, #fccb90 0%, #d57eeb 100%); }
+      .bg-sunset { background: linear-gradient(to top, #ff0844 0%, #ffb199 100%); }
+      .bg-lavender { background-color: #e0c3fc; background-image: radial-gradient(#fff 2.5px, transparent 2.5px); background-size: 20px 20px; }
+      .bg-yellow-daisy { background-color: #fdfbfb; background-image: radial-gradient(#f6d365 3.5px, transparent 3.5px); background-size: 25px 25px; }
+      .bg-holographic { background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); }
+      .bg-ocean { background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%); }
+
       .photostrip img {
-        width: 200px;
-        height: 200px;
-        border: 5px solid #ff99cc; /* Pink border */
-        margin-bottom: 10px;
-        display: block;
-        transform: scaleX(-1);
+        width: 250px; height: 180px; object-fit: cover;
+        border: 4px solid #fff; margin-bottom: 15px; display: block;
+        transform: scaleX(-1); border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       }
 
       .photostrip .date {
-        text-align: center;
-        font-size: 14px;
-        margin-top: 5px;
+        text-align: center; font-size: 16px; font-family: 'Courier New', Courier, monospace;
+        font-weight: bold; color: #333; background: rgba(255,255,255,0.7);
+        padding: 5px; border-radius: 5px;
       }
 
+      /* STICKER CÓ THỂ KÉO THẢ */
       .photostrip-container .sticker {
-        position: absolute;
-        font-size: 24px;
-        pointer-events: none;
-      }
-
-      .controls {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .control-section {
-        margin-bottom: 10px;
-      }
-
-      .control-section label {
-        display: block;
-        font-weight: 500;
-        margin-bottom: 5px;
-      }
-
-      .stickers button, .backgrounds button, .filters button {
-        width: 40px;
-        height: 40px;
-        margin: 5px;
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        position: absolute; font-size: 30px; user-select: none;
+        cursor: grab; /* Biểu tượng bàn tay báo hiệu có thể kéo */
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
         transition: transform 0.1s;
       }
-
-      .stickers button {
-        font-size: 20px;
+      .photostrip-container .sticker:active { cursor: grabbing; transform: scale(1.1); }
+      
+      .photostrip-container .text-sticker {
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        font-size: 24px; font-weight: bold; color: #ff4757; text-shadow: 2px 2px 0px #fff;
       }
 
-      .backgrounds button {
-        border: 2px solid #ccc;
+      .controls { width: 350px; text-align: left; }
+      .control-section { margin-bottom: 15px; background: #f8f9fa; padding: 15px; border-radius: 10px; border: 1px solid #e1e8ed; }
+      .control-section label { display: block; font-weight: bold; margin-bottom: 10px; color: #2f3542; }
+      .btn-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+      
+      .circle-btn {
+        width: 35px; height: 35px; border-radius: 50%; border: 2px solid #ddd;
+        cursor: pointer; transition: transform 0.1s;
       }
+      .circle-btn:hover { transform: scale(1.15); border-color: #ff6b81; }
+      .text-btn { padding: 8px 12px; border-radius: 8px; border: 1px solid #ccc; cursor: pointer; background: white;}
+      .text-btn:hover { background: #ffeaa7; transform: scale(1.05); }
 
-      .filters button {
-        padding: 5px 10px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        background-color: #fff;
-        font-size: 12px;
-        font-weight: 500;
-      }
-
-      .filters button.active {
-        background-color: #ddd;
-      }
-
-      .stickers button:hover, .backgrounds button:hover, .filters button:hover {
-        transform: translateY(-1px);
-      }
-
-      .stickers button:active, .backgrounds button:active, .filters button:active {
-        transform: translateY(0);
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-      }
-
-      .action-buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-
-      .scrapbook {
-        display: none;
-        background-color: #d2b48c; /* Tan background */
-        padding: 20px;
-        border-radius: 10px;
-        position: relative;
-        margin-top: 20px;
-        width: 90%;
-        max-width: 800px;
-        min-height: 400px;
-      }
-
-      .scrapbook .photostrip {
-        position: absolute;
-      }
-
-      .scrapbook .thumbnail {
-        position: absolute;
-        width: 80px;
-        height: 80px;
-        border: 2px solid #ff99cc;
-        border-radius: 5px;
-        background-color: #fff;
-      }
-
-      .scrapbook .thumbnail img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 3px;
-      }
-
-      .scrapbook .decor {
-        position: absolute;
-        width: 40px;
-        height: 40px;
-        background-color: #fff;
-        border: 2px solid #ff99cc;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 20px;
-      }
-
-      .footer {
-        margin-top: 10px;
-        font-size: 14px;
-        color: #333;
-      }
-
-      .footer a {
-        color: #333;
-        text-decoration: none;
-      }
-
-      .footer a:hover {
-        text-decoration: underline;
-      }
     </style>
   </head>
   <body>
+    <div id="flash"></div> 
+    
     <div class="container">
-      <!-- Capture Section -->
+      <h1 style="color: #2f3542; margin-bottom: 5px;">📸 </h1>
+      <p style="color: #747d8c; margin-top: 0; margin-bottom: 20px;">Chill thử cho vui nè !</p>
+
       <div class="capture-section active" id="capture-section">
-        <button id="capture-btn" class="button">Nhấn vào đây để chụp</button>
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <button id="capture-btn" class="button">Bắt đầu chụp (4 nháy)</button>
+            <button id="beauty-btn" class="button">✨ Bật Beauty Mode</button>
+        </div>
+        
         <div class="video-container">
           <video id="video" autoplay></video>
           <div id="countdown"></div>
@@ -396,181 +223,116 @@
           <div class="photo-slot" id="slot-1"></div>
           <div class="photo-slot" id="slot-2"></div>
           <div class="photo-slot" id="slot-3"></div>
+          <div class="photo-slot" id="slot-4"></div>
         </div>
-        <div id="error-message"></div>
       </div>
 
-      <!-- Upload Section -->
-      <div class="upload-section" id="upload-section">
-        <h2>Upload your photo(s)!</h2>
-        <div class="upload-slots">
-          <div class="upload-slot" id="upload-slot-1">
-            <input type="file" id="upload-1" accept="image/*" />
-          </div>
-          <div class="upload-slot" id="upload-slot-2">
-            <input type="file" id="upload-2" accept="image/*" />
-          </div>
-          <div class="upload-slot" id="upload-slot-3">
-            <input type="file" id="upload-3" accept="image/*" />
-          </div>
-        </div>
-        <button id="submit-btn" class="button">Submit Images</button>
-        <p>Upload at least 1 image to submit</p>
-      </div>
-
-      <!-- Editor Section -->
       <div class="editor" id="editor">
         <div class="photostrip-container">
           <div class="photostrip" id="photostrip">
-            <div>
-              <img id="photo-1" src="" alt=" " />
-            </div>
-            <div>
-              <img id="photo-2" src="" alt=" " />
-            </div>
-            <div>
-              <img id="photo-3" src="" alt=" " />
-            </div>
-            <div class="date" id="date-stamp">May 24, 2025</div>
+            <div><img id="photo-1" src="" alt=" " /></div>
+            <div><img id="photo-2" src="" alt=" " /></div>
+            <div><img id="photo-3" src="" alt=" " /></div>
+            <div><img id="photo-4" src="" alt=" " /></div>
+            <div class="date" id="date-stamp"></div>
           </div>
         </div>
-        <div class="controls">
-          <div class="control-section stickers">
-            <label>Stickers</label>
-            <button data-sticker="🦄" class="button"></button>
-            <button data-sticker="🐾" class="button"></button>
-            <button data-sticker="🐼" class="button"></button>
-            <button data-sticker="✨" class="button"></button>
-          </div>
-          <div class="control-section backgrounds">
-            <label>Photostrip Background</label>
-            <button style="background-color: #000;" data-bg="#000" class="button"></button>
-            <button style="background-color: #fff;" data-bg="#fff" class="button"></button>
-            <button style="background-color: #f0f0f0;" data-bg="#f0f0f0" class="button"></button>
-            <button style="background-color: #add8e6;" data-bg="#add8e6" class="button"></button>
-            <button style="background-color: #ff99cc;" data-bg="#ff99cc" class="button"></button>
-          </div>
-          <div class="control-section filters">
-            <label>Filters</label>
-            <button data-filter="black-and-whitewhite" class="button">B&W</button>
-            <button data-filter="sepia" class="button">Sepia</button>
-            <button data-filter="warm" class="button">Warm</button>
-            <button data-filter="cold" class="button">Cold</button>
-            <button data-filter="cool" class="button">Cool</button>
-            <button data-filter="none" class="button active">None</button>
-          </div>
-          <div class="control-section">
-            <label>
-              <input type="checkbox" id="enable-date" checked />
-              Enable Date
-            </label>
-          </div>
-          <div class="action-buttons">
-            <button id="preview-btn" class="button">Preview</button>
-            <button id="download-btn" class="button">Download</button>
-            <button id="retake-btn" class="button">Retake</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Scrapbook Section -->
-      <div class="scrapbook" id="scrapbook">
-        <div class="photostrip" style="left: 20px; top: 20px;">
-          <img id="scrap-photo-1" src="" alt="Photo 1" />
-          <img id="scrap-photo-2" src="" alt="Photo 2" />
-          <img id="scrap-photo-3" src="" alt="Photo 3" />
-          <div class="date">May 24, 2025</div>
-        </div>
-        <div class="photostrip" style="right: 20px; top: 20px;">
-          <img id="scrap-photo-4" src="" alt="Photo 4" />
-          <img id="scrap-photo-5" src="" alt="Photo 5" />
-          <img id="scrap-photo-6" src="" alt="Photo 6" />
-          <div class="date">May 24, 2025</div>
-        </div>
-        <div class="thumbnail" style="left: 150px; top: 80px;"><img id="thumb-1" src="" alt="Thumbnail 1" /></div>
-        <div class="thumbnail" style="left: 150px; top: 180px;"><img id="thumb-2" src="" alt="Thumbnail 2" /></div>
-        <div class="thumbnail" style="left: 250px; top: 120px;"><img id="thumb-3" src="" alt="Thumbnail 3" /></div>
-        <div class="thumbnail" style="left: 300px; top: 200px;"><img id="thumb-4" src="" alt="Thumbnail 4" /></div>
-        <div class="thumbnail" style="right: 150px; top: 80px;"><img id="thumb-5" src="" alt="Thumbnail 5" /></div>
-        <div class="thumbnail" style="right: 150px; top: 180px;"><img id="thumb-6" src="" alt="Thumbnail 6" /></div>
-        <div class="decor" style="left: 50px; top: 50px;">🌸</div>
-        <div class="decor" style="left: 50px; top: 300px;">💖</div>
-        <div class="decor" style="right: 50px; top: 50px;">🌸</div>
-        <div class="decor" style="right: 50px; top: 300px;">💖</div>
-        <div class="decor" style="left: 200px; top: 150px;">🌟</div>
-        <div class="decor" style="right: 200px; top: 150px;">🌟</div>
-      </div>
-
-      <div class="footer">
         
+        <div class="controls">
+          <div class="control-section">
+            <label>🖼️ Chọn Hình Nền (Background)</label>
+            <div class="btn-wrap">
+                <button class="circle-btn bg-white" data-bg="bg-white"></button>
+                <button class="circle-btn bg-haru" data-bg="bg-haru"></button>
+                <button class="circle-btn bg-pink-dots" data-bg="bg-pink-dots"></button>
+                <button class="circle-btn bg-grid-cute" data-bg="bg-grid-cute"></button>
+                <button class="circle-btn bg-mint-stripes" data-bg="bg-mint-stripes"></button>
+                <button class="circle-btn bg-pastel-gradient" data-bg="bg-pastel-gradient"></button>
+                <button class="circle-btn bg-sunset" data-bg="bg-sunset"></button>
+                <button class="circle-btn bg-lavender" data-bg="bg-lavender"></button>
+                <button class="circle-btn bg-yellow-daisy" data-bg="bg-yellow-daisy"></button>
+                <button class="circle-btn bg-holographic" data-bg="bg-holographic"></button>
+                <button class="circle-btn bg-ocean" data-bg="bg-ocean"></button>
+            </div>
+          </div>
+
+          <div class="control-section stickers">
+            <label>🎨 Stickers (Click để dán, KÉO để di chuyển, CLICK ĐÚP để xóa nha mng ơi.)</label>
+            <div class="btn-wrap">
+                <button data-sticker="❤️" class="text-btn">❤️</button>
+                <button data-sticker="✨" class="text-btn">✨</button>
+                <button data-sticker="🎀" class="text-btn">🎀</button>
+                <button data-sticker="🐶" class="text-btn">🐶</button>
+                <button data-sticker="😎" class="text-btn">😎</button>
+                <button data-sticker="🌸" class="text-btn">🌸</button>
+                <button data-sticker="⭐" class="text-btn">⭐</button>
+                <button data-sticker="👑" class="text-btn">👑</button>
+                <button data-sticker="I LOVE YOU" class="text-btn text-sticker-btn">I LOVE YOU</button>
+                <button data-sticker="BFF 💕" class="text-btn text-sticker-btn">BFF 💕</button>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button id="download-btn" class="button">⬇️ Tải Ảnh Xuống</button>
+            <button id="retake-btn" class="button">🔄 Chụp Lại Lần Nữa</button>
+          </div>
+        </div>
       </div>
     </div>
+
     <script>
-      var captureSection = document.getElementById("capture-section");
-      var uploadSection = document.getElementById("upload-section");
-      var editor = document.getElementById("editor");
-      var slots = [
-        document.getElementById("slot-1"),
-        document.getElementById("slot-2"),
-        document.getElementById("slot-3")
+      const captureSection = document.getElementById("capture-section");
+      const editor = document.getElementById("editor");
+      const slots = [
+        document.getElementById("slot-1"), document.getElementById("slot-2"),
+        document.getElementById("slot-3"), document.getElementById("slot-4")
       ];
-      var uploads = [
-        document.getElementById("upload-1"),
-        document.getElementById("upload-2"),
-        document.getElementById("upload-3")
+      const photos = [
+        document.getElementById("photo-1"), document.getElementById("photo-2"),
+        document.getElementById("photo-3"), document.getElementById("photo-4")
       ];
-      var submitBtn = document.getElementById("submit-btn");
-      var photostripContainer = document.querySelector(".photostrip-container");
-      var photostrip = document.getElementById("photostrip");
-      var photos = [
-        document.getElementById("photo-1"),
-        document.getElementById("photo-2"),
-        document.getElementById("photo-3")
-      ];
-      var stickerButtons = document.querySelectorAll(".stickers button");
-      var backgroundButtons = document.querySelectorAll(".backgrounds button");
-      var filterButtons = document.querySelectorAll(".filters button");
-      var enableDate = document.getElementById("enable-date");
-      var dateStamp = document.getElementById("date-stamp");
-      var previewBtn = document.getElementById("preview-btn");
-      var downloadBtn = document.getElementById("download-btn");
-      var retakeBtn = document.getElementById("retake-btn");
-      var scrapbook = document.getElementById("scrapbook");
-      var video = document.getElementById("video");
-      var errorMessage = document.getElementById("error-message");
-      var captureBtn = document.getElementById("capture-btn");
-      var countdown = document.getElementById("countdown");
+      const video = document.getElementById("video");
+      const captureBtn = document.getElementById("capture-btn");
+      const beautyBtn = document.getElementById("beauty-btn");
+      const countdown = document.getElementById("countdown");
+      const flash = document.getElementById("flash");
+      const photostrip = document.getElementById("photostrip");
+      
+      let capturedImages = [];
+      let currentSlotIndex = 0;
+      let isBeautyMode = false;
 
-      var capturedImages = [];
-      var currentFilter = "none";
-      var stickers = [];
-      var currentSlotIndex = 0;
-      var stickerPositions = [
-        { left: -40, top: 0 },    // Top-left
-        { left: 230, top: 0 },    // Top-right
-        { left: -40, top: 210 },  // Middle-left
-        { left: 230, top: 210 },  // Middle-right
-        { left: -40, top: 420 },  // Bottom-left
-        { left: 230, top: 420 }   // Bottom-right
-      ];
-      var nextStickerPositionIndex = 0;
+      const updateDate = () => {
+        const dateOptions = { timeZone: 'Asia/Ho_Chi_Minh', year: 'numeric', month: '2-digit', day: '2-digit' };
+        document.getElementById('date-stamp').textContent = new Date().toLocaleDateString('vi-VN', dateOptions);
+      };
 
-      // Access the camera and stream to video
-      navigator.mediaDevices.getUserMedia({ video: true })
-        .then((stream) => {
-          video.srcObject = stream;
-          errorMessage.style.display = "none";
-        })
-        .catch((error) => {
-          console.error("Error accessing camera:", error);
-          errorMessage.style.display = "block";
-          errorMessage.textContent = "Unable to access camera. Please allow camera permissions in your browser settings and ensure you're using HTTPS.";
-          captureBtn.disabled = true;
-        });
+      navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 } })
+        .then((stream) => { video.srcObject = stream; })
+        .catch(() => { alert("Lỗi Camera! Vui lòng cấp quyền camera trong trình duyệt."); });
 
-      // Start countdown and capture photo
+      beautyBtn.addEventListener("click", () => {
+        isBeautyMode = !isBeautyMode;
+        beautyBtn.classList.toggle("active");
+        video.classList.toggle("beauty-on");
+      });
+
       captureBtn.addEventListener("click", () => {
         captureBtn.disabled = true;
+        takeNextPhoto();
+      });
+
+      function takeNextPhoto() {
+        if (currentSlotIndex >= slots.length) {
+            setTimeout(() => {
+                captureSection.classList.remove("active");
+                editor.classList.add("active");
+                updateDate();
+                renderEditPhotos();
+            }, 1000);
+            return;
+        }
+
         let timeLeft = 3;
         countdown.style.display = "flex";
         countdown.textContent = timeLeft;
@@ -580,225 +342,130 @@
           if (timeLeft > 0) {
             countdown.textContent = timeLeft;
           } else {
-            countdown.style.display = "none";
             clearInterval(countdownInterval);
-            capturePhoto();
-            captureBtn.disabled = false;
+            countdown.style.display = "none";
+            
+            flash.classList.add("flash-active");
+            setTimeout(() => flash.classList.remove("flash-active"), 150);
+            
+            capturePhotoToCanvas();
+            setTimeout(takeNextPhoto, 1000);
           }
         }, 1000);
-      });
+      }
 
-      // Capture photo for the current slot
-      function capturePhoto() {
-        var canvas = document.createElement("canvas");
-        var context = canvas.getContext("2d");
+      function capturePhotoToCanvas() {
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-
-        // Draw the current video frame to the canvas
+        if(isBeautyMode) context.filter = "brightness(1.15) contrast(0.95) saturate(1.2) blur(1px)";
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        var dataURL = canvas.toDataURL("image/png");
-
-        // Display the captured photo in the current slot
-        var img = document.createElement("img");
+        
+        const dataURL = canvas.toDataURL("image/png");
+        const img = document.createElement("img");
         img.src = dataURL;
         slots[currentSlotIndex].innerHTML = "";
         slots[currentSlotIndex].appendChild(img);
         capturedImages[currentSlotIndex] = dataURL;
-
-        // Move to the next slot
         currentSlotIndex++;
-        if (currentSlotIndex >= slots.length) {
-          // All slots are filled, proceed to upload section
-          captureSection.classList.remove("active");
-          uploadSection.classList.add("active");
-          updateSubmitButton();
-          currentSlotIndex = 0; // Reset for potential retake
-        }
       }
 
-      // Handle image uploads
-      slots.forEach((slot, index) => {
-        slot.addEventListener("click", () => {
-          uploads[index].click();
-        });
-        uploads[index].addEventListener("change", (e) => {
-          var file = e.target.files[0];
-          if (file) {
-            var reader = new FileReader();
-            reader.onload = (e) => {
-              var img = document.createElement("img");
-              img.src = e.target.result;
-              slot.innerHTML = "";
-              slot.appendChild(img);
-              capturedImages[index] = e.target.result;
-              updateSubmitButton();
-            };
-            reader.readAsDataURL(file);
-          }
-        });
-      });
-
-      // Enable submit button if at least one image is uploaded
-      function updateSubmitButton() {
-        var uploaded = uploads.some(upload => upload.files.length > 0);
-        if (uploaded) {
-          submitBtn.classList.add("enabled");
-          submitBtn.disabled = false;
-        } else {
-          submitBtn.classList.remove("enabled");
-          submitBtn.disabled = true;
-        }
+      function renderEditPhotos() {
+        capturedImages.forEach((dataURL, index) => { photos[index].src = dataURL; });
       }
 
-      // Submit images and proceed to editor
-      submitBtn.addEventListener("click", () => {
-        if (capturedImages.length > 0) {
-          while (capturedImages.length < 3) {
-            capturedImages.push(capturedImages[0]); // Duplicate the first image if fewer than 3
-          }
-          uploadSection.classList.remove("active");
-          editor.classList.add("active");
-          updatePhotostrip();
-        }
-      });
-
-      // Update photostrip images with current filter
-      function updatePhotostrip() {
-        capturedImages.forEach((dataURL, index) => {
-          photos[index].src = dataURL;
-          photos[index].style.filter = getFilterStyle(currentFilter);
-        });
-      }
-
-      // Get CSS filter style based on filter name
-      function getFilterStyle(filter) {
-        switch (filter) {
-          case "black-and-white":
-            return "grayscale(100%)";
-          case "sepia":
-            return "sepia(100%)";
-          case "warm":
-            return "hue-rotate(-30deg) saturate(150%)";
-          case "cold":
-            return "hue-rotate(180deg) saturate(150%)";
-          case "cool":
-            return "hue-rotate(210deg) brightness(110%)";
-          default:
-            return "none";
-        }
-      }
-
-      // Add sticker to photostrip in fixed positions around the strip
-      stickerButtons.forEach(button => {
+      // Logic Đổi Background
+      document.querySelectorAll(".circle-btn").forEach(button => {
         button.addEventListener("click", () => {
-          var sticker = button.getAttribute("data-sticker");
-          var position = stickerPositions[nextStickerPositionIndex];
-          var stickerEl = document.createElement("span");
-          stickerEl.className = "sticker";
-          stickerEl.textContent = sticker;
-          stickerEl.style.left = position.left + "px";
-          stickerEl.style.top = position.top + "px";
-          photostripContainer.appendChild(stickerEl);
-          stickers.push(stickerEl);
-
-          // Move to the next position, looping back to the start if necessary
-          nextStickerPositionIndex = (nextStickerPositionIndex + 1) % stickerPositions.length;
+          photostrip.className = "photostrip"; 
+          const bgClass = button.getAttribute("data-bg");
+          photostrip.classList.add(bgClass);
         });
       });
 
-      // Change photostrip background
-      backgroundButtons.forEach(button => {
+      // Logic Thêm Sticker & Kéo thả
+      document.querySelectorAll(".stickers button").forEach(button => {
         button.addEventListener("click", () => {
-          var bgColor = button.getAttribute("data-bg");
-          photostrip.style.backgroundColor = bgColor;
+          const stickerText = button.getAttribute("data-sticker");
+          const stickerEl = document.createElement("span");
+          
+          stickerEl.textContent = stickerText;
+          stickerEl.className = (stickerText.length > 2) ? "sticker text-sticker" : "sticker";
+          
+          // Khởi tạo vị trí ngẫu nhiên giữa màn hình ảnh
+          stickerEl.style.top = (Math.random() * 500 + 50) + "px";
+          stickerEl.style.left = (Math.random() * 100 + 50) + "px";
+          
+          // Click đúp để xóa
+          stickerEl.addEventListener('dblclick', () => { stickerEl.remove(); });
+
+          photostrip.appendChild(stickerEl);
+          
+          // GỌI HÀM KÉO THẢ CHO STICKER VỪA TẠO
+          dragElement(stickerEl);
         });
       });
 
-      // Apply filter
-      filterButtons.forEach(button => {
-        button.addEventListener("click", () => {
-          filterButtons.forEach(btn => btn.classList.remove("active"));
-          button.classList.add("active");
-          currentFilter = button.getAttribute("data-filter");
-          updatePhotostrip();
-        });
-      });
+      // CƠ CHẾ KÉO THẢ THẦN THÁNH
+      function dragElement(elmnt) {
+        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        
+        elmnt.onmousedown = dragMouseDown;
+        elmnt.ontouchstart = dragMouseDown; // Hỗ trợ màn hình cảm ứng điện thoại
 
-      // Toggle date stamp
-      enableDate.addEventListener("change", () => {
-        dateStamp.style.display = enableDate.checked ? "block" : "none";
-      });
-
-      // Download photostrip
-      downloadBtn.addEventListener("click", () => {
-        var canvas = document.createElement("canvas");
-        canvas.width = 220;
-        canvas.height = 670;
-        var context = canvas.getContext("2d");
-
-        // Draw background
-        context.fillStyle = photostrip.style.backgroundColor || "#fff";
-        context.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Draw images
-        capturedImages.forEach((dataURL, index) => {
-          var img = new Image();
-          img.src = dataURL;
-          context.drawImage(img, 10, 10 + (index * 210), 200, 200);
-          context.lineWidth = 5;
-          context.strokeStyle = "#ff99cc";
-          context.strokeRect(10, 10 + (index * 210), 200, 200);
-        });
-
-        // Draw stickers
-        stickers.forEach(sticker => {
-          var x = parseFloat(sticker.style.left) + 10; // Adjust for photostrip padding
-          var y = parseFloat(sticker.style.top) + 10;
-          context.font = "24px Arial";
-          context.fillText(sticker.textContent, x, y);
-        });
-
-        // Draw date stamp
-        if (enableDate.checked) {
-          context.font = "14px Arial";
-          context.textAlign = "center";
-          context.fillStyle = "#000";
-          context.fillText("May 24, 2025", 110, 650);
+        function dragMouseDown(e) {
+          e = e || window.event;
+          // Ngăn cuộn màn hình khi lướt trên sticker
+          if(e.type === 'touchstart') e.preventDefault(); 
+          
+          pos3 = e.clientX || e.touches[0].clientX;
+          pos4 = e.clientY || e.touches[0].clientY;
+          
+          document.onmouseup = closeDragElement;
+          document.ontouchend = closeDragElement;
+          
+          document.onmousemove = elementDrag;
+          document.ontouchmove = elementDrag;
         }
 
-        var a = document.createElement("a");
-        a.href = canvas.toDataURL("image/png");
-        a.download = "photostrip.png";
-        a.click();
-      });
+        function elementDrag(e) {
+          e = e || window.event;
+          if(e.type === 'touchmove') e.preventDefault(); 
+          
+          let clientX = e.clientX || e.touches[0].clientX;
+          let clientY = e.clientY || e.touches[0].clientY;
+          
+          pos1 = pos3 - clientX;
+          pos2 = pos4 - clientY;
+          pos3 = clientX;
+          pos4 = clientY;
+          
+          elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+          elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+        }
 
-      // Preview in scrapbook
-      previewBtn.addEventListener("click", () => {
+        function closeDragElement() {
+          document.onmouseup = null;
+          document.onmousemove = null;
+          document.ontouchend = null;
+          document.ontouchmove = null;
+        }
+      }
+
+      document.getElementById("retake-btn").addEventListener("click", () => {
         editor.classList.remove("active");
-        scrapbook.classList.add("active");
-        document.querySelectorAll(".scrapbook img").forEach((img, index) => {
-          img.src = capturedImages[index % 3];
-          img.style.filter = getFilterStyle(currentFilter);
-        });
-      });
-
-      // Retake photos (return to capture section)
-      retakeBtn.addEventListener("click", () => {
-        editor.classList.remove("active");
-        uploadSection.classList.remove("active");
         captureSection.classList.add("active");
+        currentSlotIndex = 0; capturedImages = [];
         slots.forEach(slot => slot.innerHTML = "");
-        uploads.forEach(upload => upload.value = "");
-        stickers.forEach(sticker => sticker.remove());
-        stickers = [];
-        scrapbook.classList.remove("active");
-        capturedImages = [];
-        currentSlotIndex = 0;
-        nextStickerPositionIndex = 0;
-        updateSubmitButton();
+        document.querySelectorAll(".photostrip .sticker").forEach(el => el.remove());
+        captureBtn.disabled = false;
       });
+
+      document.getElementById("download-btn").addEventListener("click", () => {
+         alert("Nếu lỡ có cần lưu ảnh thì mình cũng có thể chụp màn hình sau khi tải ảnh cho sắc nét nha mọi người !!!");
+      });
+
     </script>
   </body>
 </html>
