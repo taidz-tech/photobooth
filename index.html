@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Super PhotoBooth Pro</title>
+    <title>Super PhotoBooth Pro - 50 Backgrounds</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
       body {
@@ -16,55 +16,34 @@
       }
 
       #flash {
-        position: fixed;
-        top: 0; left: 0; width: 100vw; height: 100vh;
-        background-color: white;
-        z-index: 9999;
-        opacity: 0;
-        pointer-events: none;
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background-color: white; z-index: 9999;
+        opacity: 0; pointer-events: none;
         transition: opacity 0.1s ease-out;
       }
       .flash-active { opacity: 1 !important; }
 
       .container {
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background: rgba(255, 255, 255, 0.95);
-        padding: 30px;
-        border-radius: 20px;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        text-align: center; display: flex; flex-direction: column; align-items: center;
+        background: rgba(255, 255, 255, 0.95); padding: 30px;
+        border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.15);
         backdrop-filter: blur(10px);
       }
 
-      .capture-section, .upload-section, .editor {
-        display: none;
-      }
-
+      .capture-section, .upload-section, .editor { display: none; }
       .capture-section.active, .upload-section.active, .editor.active {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        display: flex; flex-direction: column; align-items: center;
         animation: fadeIn 0.5s;
       }
 
       @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
       .button {
-        background-color: #ff7e67;
-        color: #fff;
-        border: none;
-        padding: 12px 24px;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-        margin: 8px 5px;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: all 0.2s;
+        background-color: #ff7e67; color: #fff; border: none;
+        padding: 12px 24px; font-size: 16px; font-weight: bold;
+        cursor: pointer; margin: 8px 5px; border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: all 0.2s;
       }
-
       .button:disabled { background-color: #ccc; cursor: not-allowed; box-shadow: none; }
       .button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
       .button:active:not(:disabled) { transform: translateY(0); }
@@ -76,78 +55,83 @@
       #download-btn { background-color: #9b59b6; width: 100%; margin-top: 15px;}
       #retake-btn { background-color: #ff4757; width: 100%;}
 
-      .video-container {
-        position: relative;
-        width: 640px;
-        height: 480px;
-        margin: 15px 0;
-      }
-
+      .video-container { position: relative; width: 640px; height: 480px; margin: 15px 0; }
       video {
-        width: 100%; height: 100%;
-        border-radius: 15px;
-        background-color: #000;
-        transform: scaleX(-1);
-        object-fit: cover;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        width: 100%; height: 100%; border-radius: 15px; background-color: #000;
+        transform: scaleX(-1); object-fit: cover; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         transition: filter 0.3s;
       }
-
-      .beauty-on {
-        filter: brightness(1.15) contrast(0.95) saturate(1.2) blur(0.5px);
-      }
+      .beauty-on { filter: brightness(1.15) contrast(0.95) saturate(1.2) blur(0.5px); }
 
       #countdown {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 150px;
-        font-weight: bold;
-        color: #fff;
-        background-color: rgba(0, 0, 0, 0.4);
-        border-radius: 15px;
-        display: none;
-        text-shadow: 0 0 20px rgba(0,0,0,0.5);
-      }
-
-      #photos {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        margin-top: 10px;
-      }
-
-      .photo-slot {
-        width: 140px; height: 100px;
-        background-color: #eee;
-        border: 3px dashed #ccc;
-        border-radius: 10px;
-        transform: scaleX(-1);
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         display: flex; justify-content: center; align-items: center;
-        overflow: hidden;
+        font-size: 150px; font-weight: bold; color: #fff;
+        background-color: rgba(0, 0, 0, 0.4); border-radius: 15px;
+        display: none; text-shadow: 0 0 20px rgba(0,0,0,0.5);
       }
 
+      #photos { display: flex; justify-content: center; gap: 15px; margin-top: 10px; }
+      .photo-slot {
+        width: 140px; height: 100px; background-color: #eee;
+        border: 3px dashed #ccc; border-radius: 10px; transform: scaleX(-1);
+        display: flex; justify-content: center; align-items: center; overflow: hidden;
+      }
       .photo-slot img { width: 100%; height: 100%; object-fit: cover; }
 
-      .editor {
-        flex-direction: row !important;
-        gap: 40px;
-      }
-
+      .editor { flex-direction: row !important; gap: 40px; }
       .photostrip-container { position: relative; }
-
       .photostrip {
-        background-color: #fff;
-        padding: 20px;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        border-radius: 5px;
-        position: relative;
-        overflow: hidden; 
+        background-color: #fff; padding: 20px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        border-radius: 5px; position: relative; overflow: hidden; 
+      }
+      .photostrip img {
+        width: 250px; height: 180px; object-fit: cover; border: 4px solid #fff;
+        margin-bottom: 15px; display: block; transform: scaleX(-1); border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+      .photostrip .date {
+        text-align: center; font-size: 16px; font-family: 'Courier New', Courier, monospace;
+        font-weight: bold; color: #333; background: rgba(255,255,255,0.7);
+        padding: 5px; border-radius: 5px; margin-top: 10px;
       }
 
-      /* 21 NỀN CŨ GIỮ NGUYÊN */
+      .photostrip-container .sticker {
+        position: absolute; font-size: 30px; user-select: none; cursor: grab;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); transition: transform 0.1s;
+      }
+      .photostrip-container .sticker:active { cursor: grabbing; transform: scale(1.1); }
+      .photostrip-container .text-sticker {
+        font-family: 'Comic Sans MS', cursive, sans-serif; font-size: 24px;
+        font-weight: bold; color: #ff4757; text-shadow: 2px 2px 0px #fff;
+      }
+
+      .controls { width: 420px; text-align: left; }
+      .control-section { margin-bottom: 15px; background: #f8f9fa; padding: 15px; border-radius: 10px; border: 1px solid #e1e8ed; }
+      .control-section label { display: block; font-weight: bold; margin-bottom: 10px; color: #2f3542; }
+      
+      /* Cải tiến hiển thị danh sách nền: Thêm Scrollbar để không bị tràn màn hình khi có 50 nền */
+      .bg-btn-wrap {
+        display: flex; flex-wrap: wrap; gap: 8px;
+        max-height: 200px; overflow-y: auto; padding-right: 5px;
+      }
+      .bg-btn-wrap::-webkit-scrollbar { width: 6px; }
+      .bg-btn-wrap::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+      .bg-btn-wrap::-webkit-scrollbar-thumb { background: #ff7e67; border-radius: 10px; }
+
+      .btn-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+      .circle-btn {
+        width: 38px; height: 38px; border-radius: 50%; border: 2px solid #ddd;
+        cursor: pointer; transition: transform 0.1s; flex-shrink: 0;
+      }
+      .circle-btn:hover { transform: scale(1.15); border-color: #ff6b81; box-shadow: 0 4px 8px rgba(0,0,0,0.2);}
+      .text-btn { padding: 8px 12px; border-radius: 8px; border: 1px solid #ccc; cursor: pointer; background: white;}
+      .text-btn:hover { background: #ffeaa7; transform: scale(1.05); }
+
+      /* =======================================================
+         KHO TÀNG 50 BACKGROUNDS (Bao gồm 19 cái siêu cấp VIP)
+         ======================================================= */
+      /* 31 Nền Cũ */
       .bg-white { background-color: #fff; }
       .bg-haru { background-color: #aebce5; background-image: linear-gradient(#ffffff 2px, transparent 2px), linear-gradient(90deg, #ffffff 2px, transparent 2px); background-size: 20px 20px; }
       .bg-pink-dots { background-color: #ffcccc; background-image: radial-gradient(#fff 15%, transparent 16%), radial-gradient(#fff 15%, transparent 16%); background-size: 30px 30px; background-position: 0 0, 15px 15px; }
@@ -169,8 +153,6 @@
       .bg-cyber-neon { background: linear-gradient(45deg, #ff00cc, #333399); }
       .bg-peach-gradient { background: linear-gradient(to right, #ffecd2 0%, #fcb69f 100%); }
       .bg-notebook { background-color: #fff; background-image: linear-gradient(#a1c4fd 1px, transparent 1px); background-size: 100% 25px; }
-
-      /* BƠM THÊM 10 NỀN MỚI CÓ PATTERN EMOJI CỰC CHẤT LƯỢNG MÀ KHÔNG NẶNG WEB */
       .bg-football { background-color: #c8e6c9; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Ctext x='12' y='35' font-size='24'%3E⚽%3C/text%3E%3C/svg%3E"); }
       .bg-flower { background-color: #fce4ec; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Ctext x='12' y='35' font-size='24'%3E🌸%3C/text%3E%3C/svg%3E"); }
       .bg-dog-paws { background-color: #ffe0b2; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Ctext x='12' y='35' font-size='24'%3E🐶%3C/text%3E%3C/svg%3E"); }
@@ -182,45 +164,26 @@
       .bg-food-burger { background-color: #fff9c4; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Ctext x='12' y='35' font-size='24'%3E🍔%3C/text%3E%3C/svg%3E"); }
       .bg-starry-night { background-color: #fff3e0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Ctext x='12' y='35' font-size='24'%3E⭐%3C/text%3E%3C/svg%3E"); }
 
-
-      .photostrip img {
-        width: 250px; height: 180px; object-fit: cover;
-        border: 4px solid #fff; margin-bottom: 15px; display: block;
-        transform: scaleX(-1); border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      }
-
-      .photostrip .date {
-        text-align: center; font-size: 16px; font-family: 'Courier New', Courier, monospace;
-        font-weight: bold; color: #333; background: rgba(255,255,255,0.7);
-        padding: 5px; border-radius: 5px;
-      }
-
-      .photostrip-container .sticker {
-        position: absolute; font-size: 30px; user-select: none;
-        cursor: grab;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-        transition: transform 0.1s;
-      }
-      .photostrip-container .sticker:active { cursor: grabbing; transform: scale(1.1); }
-      
-      .photostrip-container .text-sticker {
-        font-family: 'Comic Sans MS', cursive, sans-serif;
-        font-size: 24px; font-weight: bold; color: #ff4757; text-shadow: 2px 2px 0px #fff;
-      }
-
-      .controls { width: 400px; text-align: left; } /* Nới rộng controls 1 chút để chứa đống nút béo bở */
-      .control-section { margin-bottom: 15px; background: #f8f9fa; padding: 15px; border-radius: 10px; border: 1px solid #e1e8ed; }
-      .control-section label { display: block; font-weight: bold; margin-bottom: 10px; color: #2f3542; }
-      .btn-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
-      
-      .circle-btn {
-        width: 35px; height: 35px; border-radius: 50%; border: 2px solid #ddd;
-        cursor: pointer; transition: transform 0.1s;
-      }
-      .circle-btn:hover { transform: scale(1.15); border-color: #ff6b81; }
-      .text-btn { padding: 8px 12px; border-radius: 8px; border: 1px solid #ccc; cursor: pointer; background: white;}
-      .text-btn:hover { background: #ffeaa7; transform: scale(1.05); }
+      /* 19 NỀN MỚI CÓ HOA VĂN, CHI TIẾT ĐƯỢC VẼ BẰNG THUẬT TOÁN ĐỒ HỌA (KHÔNG DÙNG EMOJI ĐƠN ĐIỆU NỮA) */
+      .bg-cow { background-color: #fff; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M15 15 Q25 5 35 15 T50 20 Q60 40 45 45 T25 40 Q5 35 15 15 Z' fill='%232d3436'/%3E%3Cpath d='M70 70 Q80 60 75 80 T60 90 Q50 70 70 70 Z' fill='%232d3436'/%3E%3C/svg%3E"); }
+      .bg-watermelon { background-color: #ffeaa7; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M10 30 A20 20 0 0 0 50 30 Z' fill='%23ff7675'/%3E%3Cpath d='M10 30 A20 20 0 0 0 50 30' fill='none' stroke='%2300b894' stroke-width='4'/%3E%3Ccircle cx='25' cy='35' r='1.5' fill='%232d3436'/%3E%3Ccircle cx='35' cy='35' r='1.5' fill='%232d3436'/%3E%3Ccircle cx='30' cy='42' r='1.5' fill='%232d3436'/%3E%3C/svg%3E"); }
+      .bg-cherry { background-color: #f5f6fa; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Cpath d='M25 15 Q20 25 15 30 M25 15 Q30 25 35 30' stroke='%2344bd32' stroke-width='2' fill='none'/%3E%3Ccircle cx='15' cy='32' r='5' fill='%23c23616'/%3E%3Ccircle cx='35' cy='32' r='5' fill='%23c23616'/%3E%3Cpath d='M20 12 Q25 10 30 15' stroke='%2344bd32' stroke-width='2' fill='none'/%3E%3C/svg%3E"); }
+      .bg-bear { background-color: #ffda79; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ccircle cx='30' cy='30' r='12' fill='%23cc8e35'/%3E%3Ccircle cx='20' cy='20' r='6' fill='%23cc8e35'/%3E%3Ccircle cx='40' cy='20' r='6' fill='%23cc8e35'/%3E%3Ccircle cx='30' cy='33' r='5' fill='%23ffeaa7'/%3E%3Ccircle cx='27' cy='28' r='1.5' fill='%232f3640'/%3E%3Ccircle cx='33' cy='28' r='1.5' fill='%232f3640'/%3E%3Cellipse cx='30' cy='32' rx='2' ry='1.5' fill='%232f3640'/%3E%3C/svg%3E"); }
+      .bg-cheese { background-color: #fbc531; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Ccircle cx='20' cy='20' r='10' fill='%23e1b12c'/%3E%3Ccircle cx='60' cy='40' r='14' fill='%23e1b12c'/%3E%3Ccircle cx='30' cy='70' r='12' fill='%23e1b12c'/%3E%3Ccircle cx='75' cy='15' r='6' fill='%23e1b12c'/%3E%3C/svg%3E"); }
+      .bg-memphis { background-color: #f8efba; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Ccircle cx='20' cy='20' r='10' fill='%23fd79a8'/%3E%3Cpolygon points='70,20 80,40 60,40' fill='%230984e3'/%3E%3Cpath d='M20 70 Q30 50 40 70 T60 70' stroke='%2300b894' stroke-width='5' fill='none'/%3E%3Crect x='70' y='70' width='15' height='15' fill='%23e17055' transform='rotate(45 77.5 77.5)'/%3E%3C/svg%3E"); }
+      .bg-stars { background-color: #2c3e50; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M20 5 L23 14 L32 15 L25 21 L27 30 L20 25 L13 30 L15 21 L8 15 L17 14 Z' fill='%23f1c40f'/%3E%3Ccircle cx='60' cy='20' r='2' fill='%23fff'/%3E%3Ccircle cx='10' cy='60' r='1.5' fill='%23fff'/%3E%3Cpath d='M50 45 A15 15 0 0 1 65 65 A20 20 0 0 0 50 45' fill='%23f1c40f'/%3E%3C/svg%3E"); }
+      .bg-waves { background-color: #c7ecee; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='30'%3E%3Cpath d='M0 15 Q15 0 30 15 T60 15' stroke='%2322a6b3' stroke-width='4' fill='none'/%3E%3C/svg%3E"); }
+      .bg-rainbow-stripes { background-image: repeating-linear-gradient(45deg, #ff9ff3, #ff9ff3 10px, #feca57 10px, #feca57 20px, #ff6b6b 20px, #ff6b6b 30px, #48dbfb 30px, #48dbfb 40px, #1dd1a1 40px, #1dd1a1 50px); }
+      .bg-zigzag { background-color: #ffeaa7; background-image: linear-gradient(135deg, #ff7675 25%, transparent 25%), linear-gradient(225deg, #ff7675 25%, transparent 25%), linear-gradient(315deg, #ff7675 25%, transparent 25%), linear-gradient(45deg, #ff7675 25%, transparent 25%); background-size: 40px 40px; background-position: -20px 0, -20px 0, 0 0, 0 0; }
+      .bg-cactus { background-color: #fab1a0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect x='20' y='15' width='10' height='25' rx='5' fill='%2355efc4'/%3E%3Crect x='13' y='22' width='15' height='6' rx='3' fill='%2355efc4'/%3E%3Crect x='13' y='14' width='6' height='12' rx='3' fill='%2355efc4'/%3E%3Ccircle cx='16' cy='13' r='3' fill='%23ff7675'/%3E%3Cpath d='M22 25 L28 25 M22 32 L28 32' stroke='%2300b894' stroke-width='1.5'/%3E%3C/svg%3E"); }
+      .bg-strawberry { background-color: #ffcccc; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Cpath d='M15 20 Q25 45 35 20 Q35 12 25 12 Q15 12 15 20' fill='%23ff4757'/%3E%3Cpath d='M20 12 L25 5 L30 12 L25 16 Z' fill='%232ed573'/%3E%3Ccircle cx='22' cy='20' r='1.5' fill='%23ffffff'/%3E%3Ccircle cx='28' cy='22' r='1.5' fill='%23ffffff'/%3E%3Ccircle cx='25' cy='28' r='1.5' fill='%23ffffff'/%3E%3Ccircle cx='26' cy='16' r='1.5' fill='%23ffffff'/%3E%3C/svg%3E"); }
+      .bg-tartan { background-color: #fff; background-image: repeating-linear-gradient(transparent, transparent 20px, rgba(253, 121, 168, 0.3) 20px, rgba(253, 121, 168, 0.3) 40px), repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(116, 185, 255, 0.3) 20px, rgba(116, 185, 255, 0.3) 40px); }
+      .bg-bows { background-color: #fdfbfb; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M15 20 L28 25 L15 30 Z M45 20 L32 25 L45 30 Z' fill='%23ff6b81'/%3E%3Ccircle cx='30' cy='25' r='4' fill='%23ff4757'/%3E%3Cpath d='M28 25 Q20 40 18 45 M32 25 Q40 40 42 45' stroke='%23ff6b81' stroke-width='2' fill='none'/%3E%3C/svg%3E"); }
+      .bg-bubbles { background-color: #a29bfe; background-image: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.2) 10%, transparent 11%), radial-gradient(circle at 75% 65%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.2) 20%, transparent 21%), radial-gradient(circle at 40% 80%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.3) 15%, transparent 16%); }
+      .bg-hearts-arrows { background-color: #dfe6e9; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70'%3E%3Cpath d='M35 45 Q20 30 25 20 A10 10 0 0 1 35 25 A10 10 0 0 1 45 20 Q50 30 35 45' fill='%23fd79a8'/%3E%3Cpath d='M15 15 L55 55 M15 15 L25 15 M15 15 L15 25 M55 55 L45 55 M55 55 L55 45' stroke='%2300cec9' stroke-width='2' fill='none'/%3E%3C/svg%3E"); }
+      .bg-bone { background-color: #55efc4; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect x='20' y='25' width='20' height='10' rx='4' fill='%23ffeaa7'/%3E%3Ccircle cx='18' cy='23' r='5' fill='%23ffeaa7'/%3E%3Ccircle cx='18' cy='37' r='5' fill='%23ffeaa7'/%3E%3Ccircle cx='42' cy='23' r='5' fill='%23ffeaa7'/%3E%3Ccircle cx='42' cy='37' r='5' fill='%23ffeaa7'/%3E%3C/svg%3E"); }
+      .bg-argyle { background-color: #ffeaa7; background-image: repeating-linear-gradient(120deg, rgba(255,118,117,.3), rgba(255,118,117,.3) 1px, transparent 1px, transparent 60px), repeating-linear-gradient(60deg, rgba(255,118,117,.3), rgba(255,118,117,.3) 1px, transparent 1px, transparent 60px), linear-gradient(60deg, rgba(253,121,168,.3) 25%, transparent 25%, transparent 75%, rgba(253,121,168,.3) 75%, rgba(253,121,168,.3)), linear-gradient(120deg, rgba(253,121,168,.3) 25%, transparent 25%, transparent 75%, rgba(253,121,168,.3) 75%, rgba(253,121,168,.3)); background-size: 70px 120px; }
+      .bg-music { background-color: #81ecec; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70'%3E%3Ccircle cx='20' cy='45' r='6' fill='%232d3436'/%3E%3Cpath d='M26 45 L26 20 L46 25 L46 40' stroke='%232d3436' stroke-width='2' fill='none'/%3E%3Ccircle cx='40' cy='40' r='6' fill='%232d3436'/%3E%3Cpath d='M10 15 Q30 5 50 20' stroke='%23636e72' stroke-width='1' fill='none' stroke-dasharray='4'/%3E%3C/svg%3E"); }
 
     </style>
   </head>
@@ -229,7 +192,7 @@
     
     <div class="container">
       <h1 style="color: #2f3542; margin-bottom: 5px;">📸</h1>
-      <p style="color: #747d8c; margin-top: 0; margin-bottom: 20px;">Chụp thử cho vui nè bạn !!</p>
+      <p style="color: #747d8c; margin-top: 0; margin-bottom: 20px;">Chụp thử cho vui nè bạn ơi !! </p>
 
       <div class="capture-section active" id="capture-section">
         <div style="display: flex; gap: 10px; margin-bottom: 10px;">
@@ -262,9 +225,9 @@
         
         <div class="controls">
           <div class="control-section">
-            <label>🖼️ Background (Nền)</label>
-            <div class="btn-wrap">
-                <button class="circle-btn bg-white" data-bg="bg-white" title="Trắng"></button>
+            <label>🖼️ Background (Gồm 50 nền lận nên cứ thỏa sức chọn lựa nha - Vuốt để xem thêm)</label>
+            <div class="bg-btn-wrap">
+                <button class="circle-btn bg-white" data-bg="bg-white" title="Trắng tinh khôi"></button>
                 <button class="circle-btn bg-haru" data-bg="bg-haru" title="Lưới Haru"></button>
                 <button class="circle-btn bg-pink-dots" data-bg="bg-pink-dots" title="Chấm hồng"></button>
                 <button class="circle-btn bg-grid-cute" data-bg="bg-grid-cute" title="Lưới học sinh"></button>
@@ -285,17 +248,36 @@
                 <button class="circle-btn bg-cyber-neon" data-bg="bg-cyber-neon" title="Cyber Neon"></button>
                 <button class="circle-btn bg-peach-gradient" data-bg="bg-peach-gradient" title="Đào"></button>
                 <button class="circle-btn bg-notebook" data-bg="bg-notebook" title="Vở ghi"></button>
+                <button class="circle-btn bg-football" data-bg="bg-football" title="Sân Bóng Đá"></button>
+                <button class="circle-btn bg-flower" data-bg="bg-flower" title="Vườn Hoa"></button>
+                <button class="circle-btn bg-dog-paws" data-bg="bg-dog-paws" title="Boss Cún"></button>
+                <button class="circle-btn bg-cat-paws" data-bg="bg-cat-paws" title="Dấu Chân Mèo"></button>
+                <button class="circle-btn bg-cloud-sky" data-bg="bg-cloud-sky" title="Trời Xanh Mây Trắng"></button>
+                <button class="circle-btn bg-rich-money" data-bg="bg-rich-money" title="Tài Phiệt Đô La"></button>
+                <button class="circle-btn bg-party-disco" data-bg="bg-party-disco" title="Quẩy Lên"></button>
+                <button class="circle-btn bg-heart-love" data-bg="bg-heart-love" title="Tình Yêu Đong Đầy"></button>
+                <button class="circle-btn bg-food-burger" data-bg="bg-food-burger" title="Tâm Hồn Ăn Uống"></button>
+                <button class="circle-btn bg-starry-night" data-bg="bg-starry-night" title="Đêm Đầy Sao"></button>
 
-                <button class="circle-btn bg-football" data-bg="bg-football" title="Sân Bóng Đá ⚽"></button>
-                <button class="circle-btn bg-flower" data-bg="bg-flower" title="Vườn Hoa 🌸"></button>
-                <button class="circle-btn bg-dog-paws" data-bg="bg-dog-paws" title="Boss Cún 🐶"></button>
-                <button class="circle-btn bg-cat-paws" data-bg="bg-cat-paws" title="Dấu Chân Mèo 🐾"></button>
-                <button class="circle-btn bg-cloud-sky" data-bg="bg-cloud-sky" title="Trời Xanh Mây Trắng ☁️"></button>
-                <button class="circle-btn bg-rich-money" data-bg="bg-rich-money" title="Tài Phiệt Đô La 💵"></button>
-                <button class="circle-btn bg-party-disco" data-bg="bg-party-disco" title="Quẩy Lên 🪩"></button>
-                <button class="circle-btn bg-heart-love" data-bg="bg-heart-love" title="Tình Yêu Đong Đầy 💖"></button>
-                <button class="circle-btn bg-food-burger" data-bg="bg-food-burger" title="Tâm Hồn Ăn Uống 🍔"></button>
-                <button class="circle-btn bg-starry-night" data-bg="bg-starry-night" title="Đêm Đầy Sao ⭐"></button>
+                <button class="circle-btn bg-cow" data-bg="bg-cow" title="Bò Sữa Cute"></button>
+                <button class="circle-btn bg-watermelon" data-bg="bg-watermelon" title="Dưa Hấu Mát Lạnh"></button>
+                <button class="circle-btn bg-cherry" data-bg="bg-cherry" title="Cherry Ngọt Ngào"></button>
+                <button class="circle-btn bg-bear" data-bg="bg-bear" title="Gấu Brown Đáng Yêu"></button>
+                <button class="circle-btn bg-cheese" data-bg="bg-cheese" title="Phô Mai Béo Ngậy"></button>
+                <button class="circle-btn bg-memphis" data-bg="bg-memphis" title="Memphis Phá Cách"></button>
+                <button class="circle-btn bg-stars" data-bg="bg-stars" title="Trăng Sao Lung Linh"></button>
+                <button class="circle-btn bg-waves" data-bg="bg-waves" title="Sóng Biển Gợn"></button>
+                <button class="circle-btn bg-rainbow-stripes" data-bg="bg-rainbow-stripes" title="Sọc Cầu Vồng"></button>
+                <button class="circle-btn bg-zigzag" data-bg="bg-zigzag" title="Zigzag Rực Rỡ"></button>
+                <button class="circle-btn bg-cactus" data-bg="bg-cactus" title="Xương Rồng Sa Mạc"></button>
+                <button class="circle-btn bg-strawberry" data-bg="bg-strawberry" title="Dâu Tây Đỏ Mọng"></button>
+                <button class="circle-btn bg-tartan" data-bg="bg-tartan" title="Caro Tartan"></button>
+                <button class="circle-btn bg-bows" data-bg="bg-bows" title="Nơ Đỏ Tiểu Thư"></button>
+                <button class="circle-btn bg-bubbles" data-bg="bg-bubbles" title="Bong Bóng Xà Phòng"></button>
+                <button class="circle-btn bg-hearts-arrows" data-bg="bg-hearts-arrows" title="Trái Tim Mũi Tên"></button>
+                <button class="circle-btn bg-bone" data-bg="bg-bone" title="Xương Cún Con"></button>
+                <button class="circle-btn bg-argyle" data-bg="bg-argyle" title="Quả Trám Argyle"></button>
+                <button class="circle-btn bg-music" data-bg="bg-music" title="Nốt Nhạc Vui Vẻ"></button>
             </div>
           </div>
 
@@ -505,8 +487,8 @@
             backgroundColor: null
         }).then(canvas => {
             const link = document.createElement("a");
-            // Đặt tên file đúng chuẩn ANHCHUP (viết hoa in, không dấu, không cách)
-            link.download = "ANHCHUP.png";
+            // Sếp dặn: tên file in hoa, k dấu, k cách!
+            link.download = "PHOTOBOOTH.png"; 
             link.href = canvas.toDataURL("image/png");
             link.click();
         });
